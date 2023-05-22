@@ -1,0 +1,98 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+#define relay1 2
+#define relay2 3
+#define buzzer 4
+
+LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+
+long int temp1,temp2,gas1,gas2;
+
+int i;
+
+void setup()
+
+{
+ 
+  lcd.init();                      // initialize the lcd
+  lcd.init();
+  lcd.backlight();
+ lcd.setCursor(0,0);
+ lcd.print("Gas Monitor Sys");
+ delay(1000);
+ 
+ pinMode(relay1, OUTPUT);
+ pinMode(relay2, OUTPUT);
+ pinMode(buzzer, OUTPUT);
+ 
+ digitalWrite(relay1,LOW);
+ digitalWrite(relay2,LOW);
+ digitalWrite(buzzer,LOW);
+ 
+ 
+ Serial.begin(9600);
+ lcd.setCursor(0,0);
+ lcd.print("Gas1     Gas2     ");
+       
+ }
+   
+
+
+
+void loop()
+       {
+       
+        for(i=0;i<5;i++)
+        {
+         temp1+=analogRead(A0);
+         delay(100);
+        }
+        gas1=temp1/5.0;
+        temp1=0;
+
+        for(i=0;i<5;i++)
+        {
+         temp2+=analogRead(A1);
+         delay(100);
+        }
+        gas2=temp2/5.0;
+        temp2=0;
+
+
+       lcd.setCursor(0,1);
+       lcd.print("         ");
+       lcd.setCursor(0,1);
+       lcd.print(gas1);
+       lcd.setCursor(9,1);
+       lcd.print("         ");
+       lcd.setCursor(9,1);
+       lcd.print(gas2);
+       
+       Serial.print("Gas1:");
+       Serial.print(gas1);
+       Serial.print(" Gas2:");
+       Serial.println(gas2);
+
+       if(gas1>580)
+       {
+       digitalWrite(relay1,HIGH);
+       digitalWrite(buzzer,HIGH);
+       delay(3000);
+       digitalWrite(buzzer,LOW);
+       }
+       else
+       digitalWrite(relay1,LOW);
+       
+       if(gas2>100)
+       {
+       digitalWrite(relay2,HIGH);
+       digitalWrite(buzzer,HIGH);
+       delay(3000);
+       digitalWrite(buzzer,LOW);
+       }
+       else
+       digitalWrite(relay2,LOW);
+       
+
+   }   // End of loop
